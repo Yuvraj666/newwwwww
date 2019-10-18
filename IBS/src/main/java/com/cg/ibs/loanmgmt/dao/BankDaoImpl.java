@@ -12,11 +12,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Map;
+import org.apache.log4j.Logger;
 
 import com.cg.ibs.loanmgmt.bean.LoanMaster;
 import com.cg.ibs.loanmgmt.bean.LoanType;
 import com.cg.ibs.loanmgmt.util.dbUtil;
-import com.sun.istack.internal.logging.Logger;
 
 public class BankDaoImpl implements BankDao {
 	private static final Logger LOGGER = Logger.getLogger(BankDaoImpl.class);
@@ -25,6 +25,7 @@ public class BankDaoImpl implements BankDao {
 	LoanMaster loanMaster = new LoanMaster();
 	Connection connection;
 
+	//Done for SQL
 	@Override
 	public boolean saveLoan(LoanMaster loanMaster) throws SQLException {
 		connection = dbUtil.getConnection();
@@ -38,7 +39,7 @@ public class BankDaoImpl implements BankDao {
 				}
 			}
 		} catch (SQLException e) {
-			LOGGER.info("SQL exception is coming.");
+			LOGGER.warn("SQL exception is coming.");
 			e.printStackTrace();
 		}
 		try (PreparedStatement preparedStatement = connection.prepareStatement(QueryMapper.INS_LOAN);) {
@@ -100,6 +101,8 @@ public class BankDaoImpl implements BankDao {
 		return isDone;
 	}
 
+//Done For SQL
+	
 	@Override
 	public LoanMaster updatePreClosure(LoanMaster loanMaster) { /*
 																 * Updating EMI after approval of PreClosure
@@ -108,15 +111,14 @@ public class BankDaoImpl implements BankDao {
 //		loanMaster.setNextEmiDate(null);
 //		loanData.replace(loanMaster.getLoanNumber(), loanMaster);
 		connection = dbUtil.getConnection();
-		String sql = "update loan set ? = ?";
+		String sql = "update loan set num_of_emis_paid = ? where loan_number = ?";
 		try (PreparedStatement preparedStatement = connection.prepareStatement(sql);) {
-			preparedStatement.setInt(1, loanMaster.getNumberOfEmis());
-			preparedStatement.setInt(2, loanMaster.getTotalNumberOfEmis());
-			try (ResultSet resultSet = preparedStatement.executeQuery();) {
-				if (resultSet.next()) {
-//					uciTemp = resultSet.getString("uci");
-				}
-			}
+
+			preparedStatement.setInt(1, loanMaster.getTotalNumberOfEmis());
+			preparedStatement.setInt(2, Integer.valueOf(loanMaster.getLoanNumber()));
+
+			preparedStatement.executeQuery();
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

@@ -6,15 +6,15 @@ public class CustomerBean{
 
 	private String firstName;
 	private String lastName;
-	private BigInteger UCI; // 16 digit Unique Customer ID
+	private String UCI; // 16 digit Unique Customer ID
 	private String userId; // unique credentials created by customer for login
 	private String password; // unique credentials created by customer for login
 
-	public CustomerBean(String firstName, String lastName, BigInteger uCI, String userId) {
+	public CustomerBean(String firstName, String lastName, String uCI, String userId) {
 		super();
 		this.firstName = firstName;
 		this.lastName = lastName;
-		UCI = uCI;
+		this.UCI = uCI;
 		this.userId = userId;
 
 	}
@@ -39,11 +39,11 @@ public class CustomerBean{
 		this.lastName = lastName;
 	}
 
-	public BigInteger getUCI() {
+	public String getUCI() {
 		return UCI;
 	}
 
-	public void setUCI(BigInteger uCI) {
+	public void setUCI(String uCI) {
 		UCI = uCI;
 	}
 

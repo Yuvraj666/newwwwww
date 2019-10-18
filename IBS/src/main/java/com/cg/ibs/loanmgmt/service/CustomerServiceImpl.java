@@ -66,11 +66,11 @@ public class CustomerServiceImpl implements CustomerService {
 		return customerDao.getCustomerDetails(userId);
 	}
 
-	public boolean uploadDocument(Document document , LoanMaster loanMaster) throws IBSException { /* Document Upload */
+	public boolean uploadDocument(Document document, LoanMaster loanMaster) throws IBSException { /* Document Upload */
 		return customerDao.uploadDocument(document);
 	}
 
-	public boolean sendLoanForVerification(LoanMaster loanMaster) throws IBSException{
+	public boolean sendLoanForVerification(LoanMaster loanMaster) throws IBSException {
 		return customerDao.sendLoanForVerification(loanMaster);
 
 	}
@@ -112,6 +112,16 @@ public class CustomerServiceImpl implements CustomerService {
 		} else {
 			return null;
 		}
+	}
+
+	public boolean updateBalance(LoanMaster loanMaster) {
+		double paidInterest = loanMaster.getLoanAmount()
+				* (Math.pow(1 + (double) loanMaster.getInterestRate() / 100.0, 1.0 / 12.0)) - loanMaster.getLoanAmount();
+		double paidPrincipal = loanMaster.getEmiAmount() - paidInterest;
+		loanMaster.setBalance(loanMaster.getBalance() - paidPrincipal);
+		System.out.println(loanMaster.getBalance()); //Remove it. Just to check whether new balance is updated!
+		return true;
+		
 	}
 
 	// LoanDetails
