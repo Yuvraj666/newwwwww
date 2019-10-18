@@ -32,9 +32,12 @@ public interface CustomerService {
 
 	public LoanMaster updateEMI(double amountPaid, LoanMaster loanMaster);
 
+	public boolean updateBalance(LoanMaster loanMaster);
+
 	// ViewLoanDetails
 
-	public List<LoanMaster> getHistory(String userId) throws SQLException, IBSException; /*getting collection of all the loans related to given userID*/
+	public List<LoanMaster> getHistory(String userId)
+			throws SQLException, IBSException; /* getting collection of all the loans related to given userID */
 
 	// PreClosure
 
@@ -53,7 +56,7 @@ public interface CustomerService {
 																// PreClosure
 																// Amount
 
-	boolean sendPreClosureForVerification(LoanMaster loanMaster) throws FileNotFoundException,
-			IOException; /* Send preClosure for verification */
+	boolean sendPreClosureForVerification(LoanMaster loanMaster)
+			throws FileNotFoundException, IOException; /* Send preClosure for verification */
 
 }

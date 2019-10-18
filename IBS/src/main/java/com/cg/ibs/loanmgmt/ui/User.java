@@ -393,6 +393,10 @@ public class User implements ExceptionMessages {
 					System.out.println("Transaction successful! \nNumber Of EMI's left : "
 							+ (loanMaster.getTotalNumberOfEmis() - loanMaster.getNumberOfEmis())
 							+ "\nNext date for EMI payment is : " + loanMaster.getNextEmiDate());
+					if(customerService.updateBalance(loanMaster))
+					{
+						System.out.println("Balance updated");
+					}
 				}
 			} else {
 				try {

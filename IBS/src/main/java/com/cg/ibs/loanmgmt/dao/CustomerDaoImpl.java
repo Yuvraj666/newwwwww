@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,31 +20,91 @@ import java.util.Map;
 import com.cg.ibs.loanmgmt.bean.CustomerBean;
 import com.cg.ibs.loanmgmt.bean.Document;
 import com.cg.ibs.loanmgmt.bean.LoanMaster;
+import com.cg.ibs.loanmgmt.bean.LoanStatus;
 import com.cg.ibs.loanmgmt.bean.LoanType;
 import com.cg.ibs.loanmgmt.exception.ExceptionMessages;
 import com.cg.ibs.loanmgmt.exception.IBSException;
 import com.cg.ibs.loanmgmt.util.dbUtil;
 
 public class CustomerDaoImpl implements CustomerDao {
-	private static DataBase base = new DataBase();
+	// private static DataBase base = new DataBase();
 	private static Map<String, LoanMaster> loanData = base.getLoanMasterData();
 	private static Map<String, CustomerBean> customerData = base.getCustomerBeanData();
 	private static LoanMaster loanMaster = new LoanMaster();
 	private static CustomerBean customer = new CustomerBean();
 
+//Done For SQL
+
 	public LoanMaster updateEMI(LoanMaster loanMaster) {
-		loanMaster.setNumberOfEmis(loanMaster.getNumberOfEmis() + 1);
-		loanMaster.setNextEmiDate(loanMaster.getNextEmiDate().plusMonths(1));
-		loanData.replace(loanMaster.getLoanNumber(), loanMaster);
-		return loanMaster;
+//		loanMaster.setNumberOfEmis(loanMaster.getNumberOfEmis() + 1);
+//		loanMaster.setNextEmiDate(loanMaster.getNextEmiDate().plusMonths(1));
+//		loanData.replace(loanMaster.getLoanNumber(), loanMaster);
+//		return loanMaster;
+		Connection connection = dbUtil.getConnection();
+		String sqlst = "update loan set num_of_emis_paid = ? where loan_number = ?";
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sqlst);) {
+			preparedStatement.setInt(1, (loanMaster.getNumberOfEmis() + 1));
+
+			// in case we go for next emi date
+			/*
+			 * 
+			 * LocalDate updatedNextEmiDate = loanMaster.getNextEmiDate().plusMonths(1);
+			 * java.sql.Date date = java.sql.Date.valueOf(updatedNextEmiDate);
+			 * preparedStatement.setDate(2, date);
+			 * 
+			 * 
+			 */
+			preparedStatement.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			// throw new IBSException(ExceptionMessages.MESSAGEFOREXCEPTION);
+		}
 	}
 
 	public LoanMaster getEMIDetails(String loanNumber) {
-		loanMaster = null;
-		if (loanData.containsKey(loanNumber)) {
-			loanMaster = loanData.get(loanNumber);
+//		loanMaster = null;
+//		if (loanData.containsKey(loanNumber)) {
+//			loanMaster = loanData.get(loanNumber);
+//		}
+//		return loanMaster;
+		Connection connection = dbUtil.getConnection();
+		String sqlst1 = "select loan_number from loan where loan_number =?";
+		try (PreparedStatement preparedStatement = connection.prepareStatement(sqlst1);) {
+			preparedStatement.setInt(1, Integer.valueOf(loanNumber));
+			try (ResultSet resultSet = preparedStatement.executeQuery()) {
+				if(resultSet.next()) {
+					if(resultSet.getInt("loan_number") == Integer.valueOf(loanNumber)) {
+				
+					String sqlst2 = "select emi_amount from loan where loan_number =?";
+					try (PreparedStatement preparedStatement2 = connection.prepareStatement(sqlst2);) {
+						preparedStatement2.setString(1, loanNumber);
+						try (ResultSet resultSet2 = preparedStatement.executeQuery()) {
+//							private String loanNumber;
+//							private LoanStatus loanStatus;
+//							private long applicationNumber;
+//							private double loanAmount;
+//							private int loanTenure;
+//							private LoanType loanType;
+//							private float interestRate;
+//							private double balance;
+//							private double emiAmount;
+//							private CustomerBean customerBean;
+//							private int numberOfEmis;
+//							private int totalNumberOfEmis;
+//							private LocalDate appliedDate;
+//							private LocalDate nextEmiDate;
+							//loanMaster.setLoanNumber(resultSet2.getInt("loan_number"));
+							//loanMaster.setLoanStatus(resultSet2.getString(""));
+							loanMaster.setEmiAmount(resultSet2.getDouble("emi_amount"));
+						}	
+						}
+				}
+			}
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			// throw new IBSException(ExceptionMessages.MESSAGEFOREXCEPTION);
 		}
-		return loanMaster;
 	}
 
 	@Override
@@ -63,6 +124,8 @@ public class CustomerDaoImpl implements CustomerDao {
 		}
 		return customer;
 	}
+
+	// Done For SQL
 
 	// LoanDetails
 	public List<LoanMaster> getHistory(String userId) throws IBSException { /* getting list of loans */
@@ -101,9 +164,7 @@ public class CustomerDaoImpl implements CustomerDao {
 			}
 		}
 
-		catch (
-
-		SQLException e) {
+		catch (SQLException e) {
 			e.printStackTrace();
 			throw new IBSException(ExceptionMessages.MESSAGEFORSQLEXCEPTION);
 		}
@@ -147,6 +208,8 @@ public class CustomerDaoImpl implements CustomerDao {
 			return isDone;
 	}
 
+	// Done For SQL
+
 	@Override
 	public boolean verifyCustomer(String userId) throws IBSException {
 		boolean check = false;
@@ -169,6 +232,8 @@ public class CustomerDaoImpl implements CustomerDao {
 		}
 		return check;
 	}
+
+	// Done For SQL
 
 	@Override
 	public boolean sendLoanForVerification(LoanMaster loanMaster) throws IBSException {
